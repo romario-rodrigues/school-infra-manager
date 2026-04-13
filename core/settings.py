@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-^=3xr3jplp9^y5ach!x)0cq^wb^h0o0j1qc!so-ogs$s!2#e(s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '100.88.68.25']
 
 
 # Application definition
@@ -60,7 +60,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,3 +130,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# redirecionador para login
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/'

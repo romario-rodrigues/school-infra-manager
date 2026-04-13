@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import dashboard # Importe a view que criamos
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', dashboard, name='dashboard'), # Rota para a página inicial
 ]
