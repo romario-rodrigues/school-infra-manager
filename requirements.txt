@@ -1,0 +1,4 @@
+django
+psycopg2-binary
+python-decouple
+django-bootstrap5
