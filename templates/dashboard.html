@@ -97,7 +97,9 @@
                     {% for cam in status_cameras %}
                     <tr>
                         <td>{{ cam.nome }}</td>
-                        <td><code>{{ cam.ip }}</code></td>
+                        {% if cam.tem_manutencao %}
+                        <span title="Possui histórico de manutenção" style="cursor:help;">🔧</span>
+                        {% endif %}
                         <td>
                             {% if cam.online %}
                                 <span class="badge bg-success">ONLINE</span>
