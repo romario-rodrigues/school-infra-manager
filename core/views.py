@@ -7,6 +7,24 @@ from maintenance.models import RegistroManutencao
 from infrastructure.utils import ping_host
 from tasks.models import Tarefa
 from tasks.forms import TarefaRapidaForm # Adicionamos o nome do formulário
+from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
+
+@login_required
+def concluir_tarefa(request, tarefa_id):
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    tarefa.status = 'Concluido'
+    tarefa.data_conclusao = timezone.now()
+    tarefa.save()
+    return redirect('dashboard')
+
+@login_required
+def reabrir_tarefa(request, tarefa_id):
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    tarefa.status = 'Pendente'
+    tarefa.data_conclusao = None # Limpa a data de conclusão ao reabrir
+    tarefa.save()
+    return redirect('dashboard')
 
 @login_required
 def dashboard(request):
@@ -37,6 +55,12 @@ def dashboard(request):
             'tem_manutencao': cam.tem_manutencao 
         })
 
+    # Tarefas que aparecem no Plano de Ação (não concluídas)
+    tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('-data_criacao')
+    
+    # Histórico (apenas concluídas), ordenadas pela conclusão mais recente
+    historico_tarefas = Tarefa.objects.filter(status='Concluido').order_by('-data_conclusao')[:10]
+
     # 3. Busca de Dados para os Cards e Listas
     total_cameras = cameras.count()
     cameras_off = total_cameras - cameras_online
@@ -53,5 +77,6 @@ def dashboard(request):
         'itens_baixo_estoque': itens_baixo_estoque,
         'form': form,
         'tarefas_pendentes': tarefas_pendentes,
+        'historico_tarefas': historico_tarefas,
     }
     return render(request, 'dashboard.html', context)

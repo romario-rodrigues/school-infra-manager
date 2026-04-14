@@ -17,8 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import dashboard # Importe a view que criamos
+from .views import concluir_tarefa # Importe a nova função
+from .views import reabrir_tarefa
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard, name='dashboard'), # Rota para a página inicial
+    path('tarefa/concluir/<int:tarefa_id>/', concluir_tarefa, name='concluir_tarefa'),
+    path('tarefa/reabrir/<int:tarefa_id>/', reabrir_tarefa, name='reabrir_tarefa'),
 ]
