@@ -122,20 +122,41 @@
 
 <div class="row mt-4">
     <div class="col-md-12">
-        <h3>📋 Plano de Ação (Tarefas)</h3>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>📋 Plano de Ação</h3>
+        </div>
+        
+        <form method="POST" class="row g-2 mb-4">
+            {% csrf_token %}
+            <div class="col-8 col-md-9">
+                {{ form.titulo }}
+            </div>
+            <div class="col-4 col-md-2">
+                {{ form.prioridade }}
+            </div>
+            <div class="col-12 col-md-1">
+                <button type="submit" class="btn btn-success w-100">Add</button>
+            </div>
+        </form>
+
         <ul class="list-group">
             {% for tarefa in tarefas_pendentes %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>{{ tarefa.titulo }}</strong> 
-                    <small class="text-muted">({{ tarefa.prioridade }})</small>
-                </div>
-                <span class="badge {% if tarefa.status == 'Execução' %}bg-primary{% else %}bg-secondary{% endif %}">
-                    {{ tarefa.status }}
-                </span>
-            </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ tarefa.titulo }}</strong> 
+                        <br class="d-md-none"> <small class="badge {% if tarefa.prioridade == 'Critica' %}bg-danger{% elif tarefa.prioridade == 'Alta' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} ml-md-2">
+                            {{ tarefa.prioridade }}
+                        </small>
+                    </div>
+                    
+                    <span class="badge {% if tarefa.status == 'Execução' %}bg-primary{% else %}bg-secondary{% endif %} p-2">
+                        {{ tarefa.status }}
+                    </span>
+                </li>
             {% empty %}
-            <li class="list-group-item text-success text-center">Tudo em dia! Nenhuma tarefa pendente.</li>
+                <li class="list-group-item text-success text-center py-4">
+                    <i class="fas fa-check-circle"></i> Tudo em dia! Nenhuma tarefa pendente.
+                </li>
             {% endfor %}
         </ul>
     </div>
