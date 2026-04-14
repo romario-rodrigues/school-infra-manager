@@ -1,39 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Infra Manager</title>
-<<<<<<< HEAD
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-dark bg-dark mb-4 shadow">
     <div class="container d-flex justify-content-between">
-=======
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-      <div class="container d-flex justify-content-between">
->>>>>>> dd48179a5d0698d7f6e5890e283267de76eda8b2
         <span class="navbar-brand mb-0 h1">IT School Dashboard</span>
         <form action="{% url 'admin:logout' %}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-outline-light btn-sm">
-            Sair do Sistema
-          </button>
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Sair do Sistema</button>
         </form>
-      </div>
-    </nav>
+    </div>
+</nav>
 
-<<<<<<< HEAD
-<div class="container pb-5"> 
+<div class="container pb-5">
     <div class="row">
         <div class="col-md-4">
             <div class="card text-white bg-primary mb-3 shadow-sm">
@@ -49,88 +35,19 @@
                     <h5 class="card-title">Câmeras Offline</h5>
                     <p class="card-text fs-2 fw-bold">{{ cameras_off }}</p>
                 </div>
-=======
-    <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <div class="card text-white bg-primary mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Câmeras Mapeadas</h5>
-              <p class="card-text fs-2">{{ total_cameras }}</p>
->>>>>>> dd48179a5d0698d7f6e5890e283267de76eda8b2
             </div>
-          </div>
         </div>
         <div class="col-md-4">
-<<<<<<< HEAD
             <div class="card text-white bg-warning mb-3 shadow-sm">
                 <div class="card-body text-center">
                     <h5 class="card-title text-dark">Itens p/ Repor</h5>
                     <p class="card-text fs-2 fw-bold text-dark">{{ itens_baixo_estoque|length }}</p>
                 </div>
-=======
-          <div class="card text-white bg-danger mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Câmeras Offline</h5>
-              <p class="card-text fs-2">{{ cameras_off }}</p>
->>>>>>> dd48179a5d0698d7f6e5890e283267de76eda8b2
             </div>
-          </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="card text-white bg-warning mb-3">
-            <div class="card-body">
-              <h5 class="card-title">Itens p/ Repor</h5>
-              <p class="card-text fs-2">{{ itens_baixo_estoque|length }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h3>Últimos Equipamentos</h3>
-          <ul class="list-group">
-            {% for eq in ultimos_equipamentos %}
-            <li class="list-group-item">
-              {{ eq.nome }} -
-              <span class="badge bg-secondary">{{ eq.ip }}</span>
-            </li>
-            {% empty %}
-            <li class="list-group-item">Nenhum equipamento cadastrado.</li>
-            {% endfor %}
-          </ul>
-        </div>
-
-        <div class="col-md-6">
-          <h3>Alerta de Estoque</h3>
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Qtd</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in itens_baixo_estoque %}
-              <tr class="table-danger">
-                <td>{{ item.nome }}</td>
-                <td>{{ item.quantidade_atual }}</td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="2">Estoque em dia!</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
     <div class="row mt-4">
-<<<<<<< HEAD
         <div class="col-md-12">
             <h3>Status das Câmeras (Real-time)</h3>
             <div class="table-responsive bg-white rounded shadow-sm">
@@ -188,7 +105,7 @@
 
             <ul class="list-group shadow-sm">
                 {% for tarefa in tarefas_pendentes %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
                         <div>
                             <strong>{{ tarefa.titulo }}</strong> 
                             <br class="d-md-none">
@@ -199,7 +116,7 @@
                         </div>
 
                         <div class="d-flex align-items-center">
-                            <span class="badge {% if tarefa.status == 'Execução' %}bg-primary{% else %}bg-secondary{% endif %} me-2 p-2">
+                            <span class="badge {% if tarefa.status == 'Execução' %}bg-primary{% else %}bg-secondary{% endif %} me-3 p-2">
                                 {{ tarefa.status }}
                             </span>
                             <a href="{% url 'concluir_tarefa' tarefa.id %}" class="btn btn-sm btn-success" title="Concluir Tarefa">
@@ -258,124 +175,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-=======
-      <div class="col-md-12">
-        <h3>Status das Câmeras (Real-time)</h3>
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle">
-            <thead class="table-dark">
-              <tr>
-                <th>Câmera</th>
-                <th>IP</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for cam in status_cameras %}
-              <tr>
-                <td>
-                  {{ cam.nome }} {% if cam.tem_manutencao %}
-                  <span
-                    title="Possui histórico de manutenção"
-                    style="cursor: help"
-                    >🔧</span
-                  >
-                  {% endif %}
-                </td>
-                <td class="text-muted">{{ cam.ip }}</td>
-                <td>
-                  {% if cam.online %}
-                  <span class="badge bg-success">ONLINE</span>
-                  {% else %}
-                  <span class="badge bg-danger">OFFLINE</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="3" class="text-center">
-                  Nenhuma câmera cadastrada.
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3>📋 Plano de Ação</h3>
-        </div>
-
-        <form method="POST" class="row g-2 mb-4">
-          {% csrf_token %}
-          <div class="col-8 col-md-9">{{ form.titulo }}</div>
-          <div class="col-4 col-md-2">{{ form.prioridade }}</div>
-          <div class="col-12 col-md-1">
-            <button type="submit" class="btn btn-success w-100">Add</button>
-          </div>
-        </form>
-
-        <ul class="list-group">
-          {% for tarefa in tarefas_pendentes %}
-          <li
-            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3"
-          >
-            <div class="ms-2 me-auto">
-              <div class="fw-bold">
-                {{ tarefa.titulo }}
-                <span
-                  class="badge {% if tarefa.prioridade == 'Critica' %}bg-danger{% elif tarefa.prioridade == 'Alta' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} ms-2"
-                  style="font-size: 0.7rem"
-                >
-                  {{ tarefa.prioridade }}
-                </span>
-              </div>
-              <small class="text-muted"
-                >Status atual: <strong>{{ tarefa.status }}</strong></small
-              >
-            </div>
-
-            <div
-              class="btn-group shadow-sm"
-              role="group"
-              style="min-width: 120px"
-            >
-              {% if tarefa.status != 'Execução' %}
-              <a
-                href="/tasks/atualizar-status/{{ tarefa.id }}/Execução/"
-                class="btn btn-sm btn-outline-primary"
-                title="Iniciar"
-                >▶️</a
-              >
-              {% endif %} {% if tarefa.status != 'Aguardando' %}
-              <a
-                href="/tasks/atualizar-status/{{ tarefa.id }}/Aguardando/"
-                class="btn btn-sm btn-outline-warning"
-                title="Pausar"
-                >⏳</a
-              >
-              {% endif %}
-
-              <a
-                href="/tasks/atualizar-status/{{ tarefa.id }}/Concluido/"
-                class="btn btn-sm btn-outline-success"
-                title="Finalizar"
-                >✅</a
-              >
-            </div>
-          </li>
-          {% empty %}
-          <li class="list-group-item text-center text-muted py-4">
-            Nenhuma tarefa pendente. Tudo limpo!
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-  </body>
-</html>
->>>>>>> dd48179a5d0698d7f6e5890e283267de76eda8b2
