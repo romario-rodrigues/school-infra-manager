@@ -14,8 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from .views import dashboard # Importe a view que criamos
 from .views import concluir_tarefa # Importe a nova função
 from .views import reabrir_tarefa
@@ -23,6 +24,10 @@ from .views import reabrir_tarefa
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard, name='dashboard'), # Rota para a página inicial
+<<<<<<< HEAD
     path('tarefa/concluir/<int:tarefa_id>/', concluir_tarefa, name='concluir_tarefa'),
     path('tarefa/reabrir/<int:tarefa_id>/', reabrir_tarefa, name='reabrir_tarefa'),
+=======
+    path('tasks/', include('tasks.urls')),
+>>>>>>> dd48179a5d0698d7f6e5890e283267de76eda8b2
 ]
