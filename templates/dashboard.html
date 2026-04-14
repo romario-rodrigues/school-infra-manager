@@ -96,10 +96,13 @@
                 <tbody>
                     {% for cam in status_cameras %}
                     <tr>
-                        <td>{{ cam.nome }}</td>
-                        {% if cam.tem_manutencao %}
-                        <span title="Possui histórico de manutenção" style="cursor:help;">🔧</span>
-                        {% endif %}
+                        <td>
+                            {{ cam.nome }}
+                            {% if cam.tem_manutencao %}
+                                <span title="Possui histórico de manutenção" style="cursor:help;">🔧</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">{{ cam.ip }}</td>
                         <td>
                             {% if cam.online %}
                                 <span class="badge bg-success">ONLINE</span>
@@ -109,7 +112,7 @@
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3">Nenhuma câmera cadastrada.</td></tr>
+                    <tr><td colspan="3" class="text-center">Nenhuma câmera cadastrada.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -117,5 +120,25 @@
     </div>
 </div>
 
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h3>📋 Plano de Ação (Tarefas)</h3>
+        <ul class="list-group">
+            {% for tarefa in tarefas_pendentes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ tarefa.titulo }}</strong> 
+                    <small class="text-muted">({{ tarefa.prioridade }})</small>
+                </div>
+                <span class="badge {% if tarefa.status == 'Execução' %}bg-primary{% else %}bg-secondary{% endif %}">
+                    {{ tarefa.status }}
+                </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-success text-center">Tudo em dia! Nenhuma tarefa pendente.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 </body>
 </html>

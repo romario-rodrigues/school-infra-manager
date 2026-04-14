@@ -5,6 +5,7 @@ from infrastructure.models import Camera, Equipamento
 from inventory.models import ItemEstoque
 from maintenance.models import RegistroManutencao # Importe o modelo novo
 from infrastructure.utils import ping_host
+from tasks.models import Tarefa
 
 @login_required
 def dashboard(request):
@@ -29,6 +30,7 @@ def dashboard(request):
     total_cameras = cameras.count()
     cameras_off = total_cameras - cameras_online
     itens_baixo_estoque = [item for item in ItemEstoque.objects.all() if item.precisa_repor]
+    tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('prioridade')
 
     context = {
         'total_cameras': total_cameras,
@@ -36,5 +38,6 @@ def dashboard(request):
         'cameras_off': cameras_off,
         'status_cameras': status_cameras,
         'itens_baixo_estoque': itens_baixo_estoque,
+        'tarefas_pendentes': tarefas_pendentes,
     }
     return render(request, 'dashboard.html', context)
