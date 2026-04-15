@@ -1,14 +1,15 @@
-from django.shortcuts import render, redirect # Unificamos os dois imports aqui
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef 
+from django.utils import timezone
+
+# Imports dos seus modelos
 from infrastructure.models import Camera, Equipamento
 from inventory.models import ItemEstoque
 from maintenance.models import RegistroManutencao 
 from infrastructure.utils import ping_host
 from tasks.models import Tarefa
-from tasks.forms import TarefaRapidaForm # Adicionamos o nome do formulário
-from django.shortcuts import get_object_or_404, redirect
-from django.utils import timezone
+from tasks.forms import TarefaRapidaForm
 
 @login_required
 def concluir_tarefa(request, tarefa_id):
@@ -22,9 +23,22 @@ def concluir_tarefa(request, tarefa_id):
 def reabrir_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     tarefa.status = 'Pendente'
-    tarefa.data_conclusao = None # Limpa a data de conclusão ao reabrir
+    tarefa.data_conclusao = None
     tarefa.save()
     return redirect('dashboard')
+
+@login_required
+def editar_tarefa(request, tarefa_id):
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    if request.method == 'POST':
+        novo_titulo = request.POST.get('titulo')
+        nova_prioridade = request.POST.get('prioridade')
+        if novo_titulo:
+            tarefa.titulo = novo_titulo
+            tarefa.prioridade = nova_prioridade
+            tarefa.save()
+            return redirect('dashboard')
+    return render(request, 'editar_tarefa.html', {'tarefa': tarefa})
 
 @login_required
 def dashboard(request):
@@ -55,19 +69,14 @@ def dashboard(request):
             'tem_manutencao': cam.tem_manutencao 
         })
 
-    # Tarefas que aparecem no Plano de Ação (não concluídas)
-    tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('-data_criacao')
-    
-    # Histórico (apenas concluídas), ordenadas pela conclusão mais recente
-    historico_tarefas = Tarefa.objects.filter(status='Concluido').order_by('-data_conclusao')[:10]
-
-    # 3. Busca de Dados para os Cards e Listas
+    # 3. Dados para Cards e Listas
     total_cameras = cameras.count()
     cameras_off = total_cameras - cameras_online
     itens_baixo_estoque = [item for item in ItemEstoque.objects.all() if item.precisa_repor]
     
-    # ESSA LINHA PRECISA ESTAR AQUI FORA PARA SEMPRE SER EXECUTADA:
-    tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('prioridade')
+    # Listas de Tarefas
+    tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('-data_criacao')
+    historico_tarefas = Tarefa.objects.filter(status='Concluido').order_by('-data_conclusao')[:10]
 
     context = {
         'total_cameras': total_cameras,
