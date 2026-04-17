@@ -31,13 +31,12 @@ def reabrir_tarefa(request, tarefa_id):
 def editar_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     if request.method == 'POST':
-        novo_titulo = request.POST.get('titulo')
-        nova_prioridade = request.POST.get('prioridade')
-        if novo_titulo:
-            tarefa.titulo = novo_titulo
-            tarefa.prioridade = nova_prioridade
-            tarefa.save()
-            return redirect('dashboard')
+        tarefa.titulo = request.POST.get('titulo')
+        tarefa.prioridade = request.POST.get('prioridade')
+        # ESTA LINHA ABAIXO É A CHAVE:
+        tarefa.descricao_detalhada = request.POST.get('descricao_detalhada') 
+        tarefa.save()
+        return redirect('dashboard')
     return render(request, 'editar_tarefa.html', {'tarefa': tarefa})
 
 @login_required
