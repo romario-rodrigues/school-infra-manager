@@ -10,6 +10,7 @@ from maintenance.models import RegistroManutencao
 from infrastructure.utils import ping_host
 from tasks.models import Tarefa
 from tasks.forms import TarefaRapidaForm
+from inventory.forms import ItemEstoqueForm
 
 @login_required
 def concluir_tarefa(request, tarefa_id):
@@ -88,3 +89,26 @@ def dashboard(request):
         'historico_tarefas': historico_tarefas,
     }
     return render(request, 'dashboard.html', context)
+
+
+@login_required
+def lista_estoque(request):
+    if request.method == 'POST':
+        form = ItemEstoqueForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('estoque') # Isso força a atualização da lista
+        else:
+            # Se cair aqui, o formulário tem erro (ex: campo obrigatório vazio)
+            print(form.errors) 
+    else:
+        form = ItemEstoqueForm()
+
+    itens = ItemEstoque.objects.all().order_by('nome')
+    itens_baixo_estoque = [item for item in itens if item.precisa_repor]
+
+    return render(request, 'estoque.html', {
+        'itens': itens,
+        'itens_baixo_estoque': itens_baixo_estoque,
+        'form': form
+    })
