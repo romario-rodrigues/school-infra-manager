@@ -71,6 +71,7 @@
                         </td>
                         <td class="text-center pe-4">
                             <button class="btn btn-sm btn-outline-primary me-1" 
+                                    title="Editar Item"
                                     data-bs-toggle="modal" data-bs-target="#editarModal"
                                     data-id="{{ item.id }}"
                                     data-nome="{{ item.nome }}"
@@ -84,11 +85,11 @@
                             <form method="POST" action="{% url 'excluir_item' item.id %}" style="display:inline;" 
                                   onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger me-1">
+                                <button type="submit" class="btn btn-sm btn-outline-danger me-1" title="Excluir Item">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
-                            <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info">
+                            <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info" title="Ver Histórico">
                                 <i class="fas fa-history"></i>
                             </a>
                         </td>
