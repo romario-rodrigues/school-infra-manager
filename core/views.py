@@ -112,3 +112,11 @@ def lista_estoque(request):
         'itens_baixo_estoque': itens_baixo_estoque,
         'form': form
     })
+
+def relatorio_estoque(request):
+    itens = ItemEstoque.objects.all().order_by('nome')
+    context = {
+        'itens': itens,
+        'data_hoje': timezone.now().strftime('%d/%m/%Y %H:%M')
+    }
+    return render(request, 'relatorio.html', context)
