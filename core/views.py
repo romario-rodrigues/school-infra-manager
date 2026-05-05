@@ -122,11 +122,13 @@ def lista_estoque(request):
 
     itens = ItemEstoque.objects.all().order_by('nome')
     itens_baixo_estoque = [item for item in itens if item.precisa_repor]
+    entradas_recentes = ItemEstoque.objects.all().order_by('-data_criacao')[:10]
     saidas = SaidaEstoque.objects.all().order_by('-data_hora')[:10]
 
     return render(request, 'estoque.html', {
         'itens': itens,
         'itens_baixo_estoque': itens_baixo_estoque,
+        'entradas_recentes': entradas_recentes,
         'form': form,
         'form_saida': form_saida,
         'saidas': saidas,

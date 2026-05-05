@@ -122,5 +122,36 @@
             </table>
         </div>
     </div>
+
+    <!-- Seção de Entradas Recentes -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white">
+            <h6 class="fw-bold mb-0">Entradas Recentes</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase small">
+                    <tr>
+                        <th class="ps-4">Item</th>
+                        <th>Categoria</th>
+                        <th>Quantidade</th>
+                        <th>Data de Criação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entrada in entradas_recentes %}
+                    <tr>
+                        <td class="ps-4">{{ entrada.nome }}</td>
+                        <td>{{ entrada.categoria.nome|default:"-" }}</td>
+                        <td>{{ entrada.quantidade_atual }}</td>
+                        <td>{{ entrada.data_criacao|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center py-5">Nenhuma entrada recente.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

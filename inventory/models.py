@@ -23,6 +23,7 @@ class ItemEstoque(models.Model):
     quantidade_minima = models.IntegerField(default=5)
     unidade_medida = models.CharField(max_length=20, default="Unidade", choices=UNIDADES)
     localizacao_fisica = models.CharField(max_length=100, blank=True, null=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
     ultima_atualizacao = models.DateTimeField(auto_now=True)
 
     def __str__(self):
