@@ -1,0 +1,10 @@
+@media print {
+    body {
+        background: white !important; /* Força o fundo branco */
+    }
+    .main-page {
+        margin: 0;
+        padding: 10mm;
+        box-shadow: none; /* Tira a sombra do papel na impressão */
+    }
+}
