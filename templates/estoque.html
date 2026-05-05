@@ -3,7 +3,14 @@
 {% block content %}
 
 <div class="container-fluid p-4">
-    <h3 class="fw-bold text-dark mb-4"><i class="fas fa-boxes me-2"></i>Controle de Estoque</h3>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-dark"><i class="fas fa-boxes me-2"></i>Controle de Estoque</h3>
@@ -43,6 +50,7 @@
                         <th class="ps-4">Item</th>
                         <th>Categoria</th>
                         <th class="text-center">Qtd Atual</th>
+                        <th>Estoque Mínimo</th>
                         <th>Status</th>
                         <th class="text-center pe-4">Ações</th>
                     </tr>
@@ -53,6 +61,7 @@
                         <td class="ps-4"><strong>{{ item.nome }}</strong></td>
                         <td>{{ item.categoria.nome|default:"-" }}</td>
                         <td class="text-center">{{ item.quantidade_atual }}</td>
+                        <td class="text-center">{{ item.quantidade_minima }}</td>
                         <td>
                             {% if item.precisa_repor %}
                                 <span class="badge bg-danger">REPOR</span>
@@ -61,11 +70,31 @@
                             {% endif %}
                         </td>
                         <td class="text-center pe-4">
-                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-primary me-1" 
+                                    data-bs-toggle="modal" data-bs-target="#editarModal"
+                                    data-id="{{ item.id }}"
+                                    data-nome="{{ item.nome }}"
+                                    data-categoria="{{ item.categoria.id }}"
+                                    data-quantidade_atual="{{ item.quantidade_atual }}"
+                                    data-quantidade_minima="{{ item.quantidade_minima }}"
+                                    data-unidade_medida="{{ item.unidade_medida }}"
+                                    data-localizacao_fisica="{{ item.localizacao_fisica }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form method="POST" action="{% url 'excluir_item' item.id %}" style="display:inline;" 
+                                  onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger me-1">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                            <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-history"></i>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="text-center py-5">Nenhum item cadastrado.</td></tr>
+                    <tr><td colspan="6" class="text-center py-5">Nenhum item cadastrado.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -154,4 +183,85 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Edição -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarModalLabel">Editar Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" id="editarForm" action="">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nome</label>
+              <input type="text" name="nome" id="editNome" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Categoria</label>
+              <select name="categoria" id="editCategoria" class="form-select">
+                {% for cat in form.fields.categoria.queryset %}
+                  <option value="{{ cat.id }}">{{ cat.nome }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Qtd Atual</label>
+              <input type="number" name="quantidade_atual" id="editQtdAtual" class="form-control" step="1" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Qtd Mínima</label>
+              <input type="number" name="quantidade_minima" id="editQtdMinima" class="form-control" step="1" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Unidade</label>
+              <select name="unidade_medida" id="editUnidade" class="form-select">
+                {% for value, label in form.fields.unidade_medida.choices %}
+                  <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Localização</label>
+              <input type="text" name="localizacao_fisica" id="editLocalizacao" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var editarModal = document.getElementById('editarModal');
+    editarModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var id = button.getAttribute('data-id');
+        var nome = button.getAttribute('data-nome');
+        var categoria = button.getAttribute('data-categoria');
+        var qtdAtual = button.getAttribute('data-quantidade_atual');
+        var qtdMinima = button.getAttribute('data-quantidade_minima');
+        var unidade = button.getAttribute('data-unidade_medida');
+        var localizacao = button.getAttribute('data-localizacao_fisica');
+
+        document.getElementById('editNome').value = nome;
+        document.getElementById('editCategoria').value = categoria;
+        document.getElementById('editQtdAtual').value = qtdAtual;
+        document.getElementById('editQtdMinima').value = qtdMinima;
+        document.getElementById('editUnidade').value = unidade;
+        document.getElementById('editLocalizacao').value = localizacao;
+
+        var form = document.getElementById('editarForm');
+        form.action = "{% url 'editar_item' 0 %}".replace('0', id);
+    });
+});
+</script>
 {% endblock %}
