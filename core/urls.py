@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from core import views
+from inventory import views as inventory_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,6 +26,6 @@ urlpatterns = [
     path('tarefa/concluir/<int:tarefa_id>/', views.concluir_tarefa, name='concluir_tarefa'),
     path('tarefa/reabrir/<int:tarefa_id>/', views.reabrir_tarefa, name='reabrir_tarefa'),
     path('tarefa/editar/<int:tarefa_id>/', views.editar_tarefa, name='editar_tarefa'),
-    path('estoque/', views.lista_estoque, name='lista_estoque'),
+    path('estoque/', inventory_views.lista_estoque, name='lista_estoque'),
     path('inventory/', include('inventory.urls')),
 ]

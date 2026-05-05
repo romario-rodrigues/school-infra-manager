@@ -10,8 +10,6 @@ from maintenance.models import RegistroManutencao
 from infrastructure.utils import ping_host
 from tasks.models import Tarefa
 from tasks.forms import TarefaRapidaForm
-from inventory.forms import ItemEstoqueForm, SaidaEstoqueForm
-from inventory.models import SaidaEstoque
 
 @login_required
 def concluir_tarefa(request, tarefa_id):
@@ -91,48 +89,6 @@ def dashboard(request):
     }
     return render(request, 'dashboard.html', context)
 
-
-@login_required
-def lista_estoque(request):
-    # Inicializar formulários com valores padrão
-    form = ItemEstoqueForm()
-    form_saida = SaidaEstoqueForm()
-
-    if request.method == 'POST':
-        # Verificar se é formulário de item ou de saída
-        if 'item' in request.POST:
-            form = ItemEstoqueForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return redirect('lista_estoque')
-            else:
-                print(form.errors)
-        else:
-            form_saida = SaidaEstoqueForm(request.POST)
-            if form_saida.is_valid():
-                saida = form_saida.save(commit=False)
-                item = saida.item
-                if item.quantidade_atual >= saida.quantidade:
-                    item.quantidade_atual -= saida.quantidade
-                    item.save()
-                    saida.save()
-                else:
-                    form_saida.add_error('quantidade', 'Quantidade insuficiente em estoque.')
-                return redirect('lista_estoque')
-
-    itens = ItemEstoque.objects.all().order_by('nome')
-    itens_baixo_estoque = [item for item in itens if item.precisa_repor]
-    entradas_recentes = ItemEstoque.objects.all().order_by('-data_criacao')[:10]
-    saidas = SaidaEstoque.objects.all().order_by('-data_hora')[:10]
-
-    return render(request, 'estoque.html', {
-        'itens': itens,
-        'itens_baixo_estoque': itens_baixo_estoque,
-        'entradas_recentes': entradas_recentes,
-        'form': form,
-        'form_saida': form_saida,
-        'saidas': saidas,
-    })
 
 def relatorio_estoque(request):
     itens = ItemEstoque.objects.all().order_by('nome')
