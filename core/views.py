@@ -94,6 +94,10 @@ def dashboard(request):
 
 @login_required
 def lista_estoque(request):
+    # Inicializar formulários com valores padrão
+    form = ItemEstoqueForm()
+    form_saida = SaidaEstoqueForm()
+
     if request.method == 'POST':
         # Verificar se é formulário de item ou de saída
         if 'item' in request.POST:
@@ -115,9 +119,6 @@ def lista_estoque(request):
                 else:
                     form_saida.add_error('quantidade', 'Quantidade insuficiente em estoque.')
                 return redirect('lista_estoque')
-    else:
-        form = ItemEstoqueForm()
-        form_saida = SaidaEstoqueForm()
 
     itens = ItemEstoque.objects.all().order_by('nome')
     itens_baixo_estoque = [item for item in itens if item.precisa_repor]
