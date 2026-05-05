@@ -71,5 +71,56 @@
             </table>
         </div>
     </div>
+
+    <!-- Seção de Saídas -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body bg-light rounded border">
+            <h6 class="fw-bold mb-3 text-secondary">Registrar Saída de Estoque</h6>
+            <form method="POST" action="{% url 'lista_estoque' %}" class="row g-2">
+                {% csrf_token %}
+                <div class="col-md-3">{{ form_saida.item }}</div>
+                <div class="col-md-1">{{ form_saida.quantidade }}</div>
+                <div class="col-md-3">{{ form_saida.local }}</div>
+                <div class="col-md-2">{{ form_saida.tipo_equipamento }}</div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-warning w-100 fw-bold">
+                        <i class="fas fa-sign-out-alt me-1"></i> REGISTRAR SAÍDA
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white">
+            <h6 class="fw-bold mb-0">Últimas Saídas</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-uppercase small">
+                    <tr>
+                        <th class="ps-4">Item</th>
+                        <th>Quantidade</th>
+                        <th>Data/Hora</th>
+                        <th>Local</th>
+                        <th>Tipo Equipamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for saida in saidas %}
+                    <tr>
+                        <td class="ps-4">{{ saida.item.nome }}</td>
+                        <td>{{ saida.quantidade }}</td>
+                        <td>{{ saida.data_hora|date:"d/m/Y H:i" }}</td>
+                        <td>{{ saida.local }}</td>
+                        <td>{{ saida.get_tipo_equipamento_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-5">Nenhuma saída registrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

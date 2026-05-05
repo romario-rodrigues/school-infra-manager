@@ -10,7 +10,8 @@ from maintenance.models import RegistroManutencao
 from infrastructure.utils import ping_host
 from tasks.models import Tarefa
 from tasks.forms import TarefaRapidaForm
-from inventory.forms import ItemEstoqueForm
+from inventory.forms import ItemEstoqueForm, SaidaEstoqueForm
+from inventory.models import SaidaEstoque
 
 @login_required
 def concluir_tarefa(request, tarefa_id):
@@ -94,23 +95,40 @@ def dashboard(request):
 @login_required
 def lista_estoque(request):
     if request.method == 'POST':
-        form = ItemEstoqueForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('estoque') # Isso força a atualização da lista
+        # Verificar se é formulário de item ou de saída
+        if 'item' in request.POST:
+            form = ItemEstoqueForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('lista_estoque')
+            else:
+                print(form.errors)
         else:
-            # Se cair aqui, o formulário tem erro (ex: campo obrigatório vazio)
-            print(form.errors) 
+            form_saida = SaidaEstoqueForm(request.POST)
+            if form_saida.is_valid():
+                saida = form_saida.save(commit=False)
+                item = saida.item
+                if item.quantidade_atual >= saida.quantidade:
+                    item.quantidade_atual -= saida.quantidade
+                    item.save()
+                    saida.save()
+                else:
+                    form_saida.add_error('quantidade', 'Quantidade insuficiente em estoque.')
+                return redirect('lista_estoque')
     else:
         form = ItemEstoqueForm()
+        form_saida = SaidaEstoqueForm()
 
     itens = ItemEstoque.objects.all().order_by('nome')
     itens_baixo_estoque = [item for item in itens if item.precisa_repor]
+    saidas = SaidaEstoque.objects.all().order_by('-data_hora')[:10]
 
     return render(request, 'estoque.html', {
         'itens': itens,
         'itens_baixo_estoque': itens_baixo_estoque,
-        'form': form
+        'form': form,
+        'form_saida': form_saida,
+        'saidas': saidas,
     })
 
 def relatorio_estoque(request):
