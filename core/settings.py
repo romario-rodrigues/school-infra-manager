@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'inventory',
     'maintenance',
     'tasks',
+    'core',
 ]
 
 MIDDLEWARE = [
