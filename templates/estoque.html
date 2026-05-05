@@ -14,178 +14,253 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-dark"><i class="fas fa-boxes me-2"></i>Controle de Estoque</h3>
-        
-        <button onclick="window.print()" class="btn btn-outline-secondary no-print">
-            <i class="fas fa-print me-1"></i> Imprimir Relatório
-        </button>
+        <div>
+            <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#novoItemModal">
+                <i class="fas fa-plus-circle me-1"></i> Novo Item
+            </button>
+            <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#saidaModal">
+                <i class="fas fa-sign-out-alt me-1"></i> Registrar Saída
+            </button>
+            <button onclick="window.print()" class="btn btn-outline-secondary no-print">
+                <i class="fas fa-print me-1"></i> Imprimir
+            </button>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body bg-light rounded border">
-            <h6 class="fw-bold mb-3 text-secondary">Cadastrar Novo Item</h6>
-            <form method="POST" class="row g-2">
-                {% csrf_token %}
-                <div class="col-md-3">{{ form.nome }}</div>
-                <div class="col-md-2">{{ form.categoria }}</div>
-                <div class="col-md-1" title="Quantidade Atual">{{ form.quantidade_atual }}</div>
-                
-                <div class="col-md-1" title="Quantidade Mínima">{{ form.quantidade_minima }}</div>
-                
-                <div class="col-md-1">{{ form.unidade_medida }}</div>
-                <div class="col-md-2">{{ form.localizacao_fisica }}</div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-success w-100 fw-bold">
-                        <i class="fas fa-save me-1"></i> SALVAR
-                    </button>
+    <!-- Abas -->
+    <ul class="nav nav-tabs mb-3" id="estoqueTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab" aria-controls="itens" aria-selected="true">
+                <i class="fas fa-list me-1"></i> Itens
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="saidas-tab" data-bs-toggle="tab" data-bs-target="#saidas" type="button" role="tab" aria-controls="saidas" aria-selected="false">
+                <i class="fas fa-sign-out-alt me-1"></i> Últimas Saídas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="entradas-tab" data-bs-toggle="tab" data-bs-target="#entradas" type="button" role="tab" aria-controls="entradas" aria-selected="false">
+                <i class="fas fa-arrow-circle-down me-1"></i> Entradas Recentes
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="estoqueTabsContent">
+        <!-- Aba Itens -->
+        <div class="tab-pane fade show active" id="itens" role="tabpanel" aria-labelledby="itens-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table id="tabela-itens" class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light text-uppercase small">
+                            <tr>
+                                <th class="ps-2">Item</th>
+                                <th>Categoria</th>
+                                <th class="text-center">Qtd Atual</th>
+                                <th class="text-center">Estoque Mínimo</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center pe-2">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in itens %}
+                            <tr>
+                                <td class="ps-2"><strong>{{ item.nome }}</strong></td>
+                                <td>{{ item.categoria.nome|default:"-" }}</td>
+                                <td class="text-center">{{ item.quantidade_atual }}</td>
+                                <td class="text-center">{{ item.quantidade_minima }}</td>
+                                <td class="text-center">
+                                    {% if item.precisa_repor %}
+                                        <span class="badge bg-danger">REPOR</span>
+                                    {% else %}
+                                        <span class="badge bg-success">OK</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center pe-2">
+                                    <button class="btn btn-sm btn-outline-primary me-1 py-0 px-1" 
+                                            title="Editar Item"
+                                            data-bs-toggle="modal" data-bs-target="#editarModal"
+                                            data-id="{{ item.id }}"
+                                            data-nome="{{ item.nome }}"
+                                            data-categoria="{{ item.categoria.id }}"
+                                            data-quantidade_atual="{{ item.quantidade_atual }}"
+                                            data-quantidade_minima="{{ item.quantidade_minima }}"
+                                            data-unidade_medida="{{ item.unidade_medida }}"
+                                            data-localizacao_fisica="{{ item.localizacao_fisica }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{% url 'excluir_item' item.id %}" style="display:inline;" 
+                                          onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger me-1 py-0 px-1" title="Excluir Item">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info py-0 px-1" title="Ver Histórico">
+                                        <i class="fas fa-history"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center py-5">Nenhum item cadastrado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-uppercase small">
-                    <tr>
-                        <th class="ps-4">Item</th>
-                        <th>Categoria</th>
-                        <th class="text-center">Qtd Atual</th>
-                        <th>Estoque Mínimo</th>
-                        <th>Status</th>
-                        <th class="text-center pe-4">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in itens %}
-                    <tr>
-                        <td class="ps-4"><strong>{{ item.nome }}</strong></td>
-                        <td>{{ item.categoria.nome|default:"-" }}</td>
-                        <td class="text-center">{{ item.quantidade_atual }}</td>
-                        <td class="text-center">{{ item.quantidade_minima }}</td>
-                        <td>
-                            {% if item.precisa_repor %}
-                                <span class="badge bg-danger">REPOR</span>
-                            {% else %}
-                                <span class="badge bg-success">OK</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center pe-4">
-                            <button class="btn btn-sm btn-outline-primary me-1" 
-                                    title="Editar Item"
-                                    data-bs-toggle="modal" data-bs-target="#editarModal"
-                                    data-id="{{ item.id }}"
-                                    data-nome="{{ item.nome }}"
-                                    data-categoria="{{ item.categoria.id }}"
-                                    data-quantidade_atual="{{ item.quantidade_atual }}"
-                                    data-quantidade_minima="{{ item.quantidade_minima }}"
-                                    data-unidade_medida="{{ item.unidade_medida }}"
-                                    data-localizacao_fisica="{{ item.localizacao_fisica }}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <form method="POST" action="{% url 'excluir_item' item.id %}" style="display:inline;" 
-                                  onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger me-1" title="Excluir Item">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                            <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info" title="Ver Histórico">
-                                <i class="fas fa-history"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="6" class="text-center py-5">Nenhum item cadastrado.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Seção de Saídas -->
-    <div class="card border-0 shadow-sm mt-4">
-        <div class="card-body bg-light rounded border">
-            <h6 class="fw-bold mb-3 text-secondary">Registrar Saída de Estoque</h6>
-            <form method="POST" action="{% url 'lista_estoque' %}" class="row g-2">
-                {% csrf_token %}
-                <div class="col-md-3">{{ form_saida.item }}</div>
-                <div class="col-md-1">{{ form_saida.quantidade }}</div>
-                <div class="col-md-3">{{ form_saida.local }}</div>
-                <div class="col-md-2">{{ form_saida.tipo_equipamento }}</div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-warning w-100 fw-bold">
-                        <i class="fas fa-sign-out-alt me-1"></i> REGISTRAR SAÍDA
-                    </button>
+        <!-- Aba Saídas -->
+        <div class="tab-pane fade" id="saidas" role="tabpanel" aria-labelledby="saidas-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light text-uppercase small">
+                            <tr>
+                                <th class="ps-2">Item</th>
+                                <th>Quantidade</th>
+                                <th>Data/Hora</th>
+                                <th>Local</th>
+                                <th>Tipo Equipamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for saida in saidas %}
+                            <tr>
+                                <td class="ps-2">{{ saida.item.nome }}</td>
+                                <td>{{ saida.quantidade }}</td>
+                                <td>{{ saida.data_hora|date:"d/m/Y H:i" }}</td>
+                                <td>{{ saida.local }}</td>
+                                <td>{{ saida.get_tipo_equipamento_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-5">Nenhuma saída registrada.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
 
-    <div class="card border-0 shadow-sm mt-4">
-        <div class="card-header bg-white">
-            <h6 class="fw-bold mb-0">Últimas Saídas</h6>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-uppercase small">
-                    <tr>
-                        <th class="ps-4">Item</th>
-                        <th>Quantidade</th>
-                        <th>Data/Hora</th>
-                        <th>Local</th>
-                        <th>Tipo Equipamento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for saida in saidas %}
-                    <tr>
-                        <td class="ps-4">{{ saida.item.nome }}</td>
-                        <td>{{ saida.quantidade }}</td>
-                        <td>{{ saida.data_hora|date:"d/m/Y H:i" }}</td>
-                        <td>{{ saida.local }}</td>
-                        <td>{{ saida.get_tipo_equipamento_display }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="5" class="text-center py-5">Nenhuma saída registrada.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Seção de Entradas Recentes -->
-    <div class="card border-0 shadow-sm mt-4">
-        <div class="card-header bg-white">
-            <h6 class="fw-bold mb-0">Entradas Recentes</h6>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-uppercase small">
-                    <tr>
-                        <th class="ps-4">Item</th>
-                        <th>Categoria</th>
-                        <th>Quantidade</th>
-                        <th>Data de Criação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entrada in entradas_recentes %}
-                    <tr>
-                        <td class="ps-4">{{ entrada.nome }}</td>
-                        <td>{{ entrada.categoria.nome|default:"-" }}</td>
-                        <td>{{ entrada.quantidade_atual }}</td>
-                        <td>{{ entrada.data_criacao|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="text-center py-5">Nenhuma entrada recente.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Aba Entradas -->
+        <div class="tab-pane fade" id="entradas" role="tabpanel" aria-labelledby="entradas-tab">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light text-uppercase small">
+                            <tr>
+                                <th class="ps-2">Item</th>
+                                <th>Categoria</th>
+                                <th>Quantidade</th>
+                                <th>Data de Criação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entrada in entradas_recentes %}
+                            <tr>
+                                <td class="ps-2">{{ entrada.nome }}</td>
+                                <td>{{ entrada.categoria.nome|default:"-" }}</td>
+                                <td>{{ entrada.quantidade_atual }}</td>
+                                <td>{{ entrada.data_criacao|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-5">Nenhuma entrada recente.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal de Edição -->
+<!-- Modal Novo Item -->
+<div class="modal fade" id="novoItemModal" tabindex="-1" aria-labelledby="novoItemModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="novoItemModalLabel"><i class="fas fa-plus-circle me-2"></i>Cadastrar Novo Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'lista_estoque' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nome</label>
+              {{ form.nome }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Categoria</label>
+              {{ form.categoria }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Qtd Atual</label>
+              {{ form.quantidade_atual }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Qtd Mínima</label>
+              {{ form.quantidade_minima }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Unidade</label>
+              {{ form.unidade_medida }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Localização</label>
+              {{ form.localizacao_fisica }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registrar Saída -->
+<div class="modal fade" id="saidaModal" tabindex="-1" aria-labelledby="saidaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saidaModalLabel"><i class="fas fa-sign-out-alt me-2"></i>Registrar Saída de Estoque</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'lista_estoque' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Item</label>
+              {{ form_saida.item }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Quantidade</label>
+              {{ form_saida.quantidade }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Tipo Equipamento</label>
+              {{ form_saida.tipo_equipamento }}
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Local</label>
+              {{ form_saida.local }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="fas fa-sign-out-alt me-1"></i> Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edição (mantido) -->
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -242,6 +317,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa DataTable na tabela de itens
+    $('#tabela-itens').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json'
+        },
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        order: [[0, 'asc']],
+        columnDefs: [
+            { orderable: false, targets: 5 } // coluna de ações não ordenável
+        ]
+    });
+
+    // Modal de edição
     var editarModal = document.getElementById('editarModal');
     editarModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
