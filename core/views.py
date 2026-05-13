@@ -72,6 +72,7 @@ def dashboard(request):
     total_cameras = cameras.count()
     cameras_off = total_cameras - cameras_online
     itens_baixo_estoque = [item for item in ItemEstoque.objects.all() if item.precisa_repor]
+    valor_total_estoque = sum(item.quantidade_atual * item.preco_unitario for item in ItemEstoque.objects.all())
     
     # Listas de Tarefas
     tarefas_pendentes = Tarefa.objects.exclude(status='Concluido').order_by('-data_criacao')
@@ -83,6 +84,7 @@ def dashboard(request):
         'cameras_off': cameras_off,
         'status_cameras': status_cameras,
         'itens_baixo_estoque': itens_baixo_estoque,
+        'valor_total_estoque': valor_total_estoque,
         'form': form,
         'tarefas_pendentes': tarefas_pendentes,
         'historico_tarefas': historico_tarefas,

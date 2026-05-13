@@ -4,7 +4,7 @@ from .models import ItemEstoque, Categoria, SaidaEstoque
 class ItemEstoqueForm(forms.ModelForm):
     class Meta:
         model = ItemEstoque
-        fields = ['nome', 'categoria', 'quantidade_atual', 'quantidade_minima', 'unidade_medida', 'localizacao_fisica']
+        fields = ['nome', 'categoria', 'quantidade_atual', 'quantidade_minima', 'unidade_medida', 'localizacao_fisica', 'preco_unitario']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do Item'}),
             'categoria': forms.Select(attrs={'class': 'form-select'}),
@@ -12,6 +12,7 @@ class ItemEstoqueForm(forms.ModelForm):
             'quantidade_minima': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Mín'}),
             'unidade_medida': forms.Select(attrs={'class': 'form-select'}),
             'localizacao_fisica': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Local'}),
+            'preco_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Preço Unitário', 'step': '0.01'}),
         }
 
 class SaidaEstoqueForm(forms.ModelForm):

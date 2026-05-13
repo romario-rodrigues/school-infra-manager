@@ -23,6 +23,7 @@ class ItemEstoque(models.Model):
     quantidade_minima = models.IntegerField(default=5)
     unidade_medida = models.CharField(max_length=20, default="Unidade", choices=UNIDADES)
     localizacao_fisica = models.CharField(max_length=100, blank=True, null=True)
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     data_criacao = models.DateTimeField(auto_now_add=True)
     ultima_atualizacao = models.DateTimeField(auto_now=True)
 
@@ -33,6 +34,16 @@ class ItemEstoque(models.Model):
     def precisa_repor(self):
         # Usando o nome correto que definimos acima
         return self.quantidade_atual <= self.quantidade_minima
+
+    @property
+    def subtotal(self):
+        return self.quantidade_atual * self.preco_unitario
+
+    @classmethod
+    def total_geral(cls):
+        from django.db.models import Sum, F
+        result = cls.objects.aggregate(total=Sum(F('quantidade_atual') * F('preco_unitario')))
+        return result['total'] or 0
 
 
 class SaidaEstoque(models.Model):

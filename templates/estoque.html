@@ -58,6 +58,8 @@
                                 <th>Categoria</th>
                                 <th class="text-center">Qtd Atual</th>
                                 <th class="text-center">Estoque Mínimo</th>
+                                <th class="text-center">Preço Unit.</th>
+                                <th class="text-center">Subtotal</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center pe-2">Ações</th>
                             </tr>
@@ -69,6 +71,8 @@
                                 <td>{{ item.categoria.nome|default:"-" }}</td>
                                 <td class="text-center">{{ item.quantidade_atual }}</td>
                                 <td class="text-center">{{ item.quantidade_minima }}</td>
+                                <td class="text-center">{{ item.preco_unitario|floatformat:2 }}</td>
+                                <td class="text-center">{{ item.subtotal|floatformat:2 }}</td>
                                 <td class="text-center">
                                     {% if item.precisa_repor %}
                                         <span class="badge bg-danger">REPOR</span>
@@ -102,8 +106,14 @@
                                 </td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="6" class="text-center py-5">Nenhum item cadastrado.</td></tr>
+                            <tr><td colspan="8" class="text-center py-5">Nenhum item cadastrado.</td></tr>
                             {% endfor %}
+                            <tr class="table-secondary fw-bold">
+                                <td colspan="4" class="text-end pe-3">Total Geral</td>
+                                <td class="text-center">-</td>
+                                <td class="text-center">{{ total_geral|floatformat:2 }}</td>
+                                <td colspan="2"></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
