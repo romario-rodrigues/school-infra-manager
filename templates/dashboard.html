@@ -4,7 +4,7 @@
 <div class="container-fluid p-4">
     
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card bg-primary text-white shadow-sm border-0">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><p class="mb-0 small">Câmeras Mapeadas</p><h3 class="fw-bold">{{ total_cameras }}</h3></div>
@@ -12,7 +12,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card bg-danger text-white shadow-sm border-0">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><p class="mb-0 small">Câmeras Offline</p><h3 class="fw-bold">{{ cameras_off }}</h3></div>
@@ -20,11 +20,19 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card bg-warning text-dark shadow-sm border-0">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div><p class="mb-0 small">Itens p/ Repor</p><h3 class="fw-bold">{{ itens_baixo_estoque|length }}</h3></div>
                     <i class="fas fa-box-open fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm border-0">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div><p class="mb-0 small">Valor Total em Estoque</p><h3 class="fw-bold">R$ {{ valor_total_estoque|floatformat:2 }}</h3></div>
+                    <i class="fas fa-dollar-sign fa-2x opacity-50"></i>
                 </div>
             </div>
         </div>

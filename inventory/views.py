@@ -48,6 +48,7 @@ def lista_estoque(request):
         'form_saida': form_saida,
         'saidas': saidas,
         'entradas_recentes': entradas_recentes,
+        'total_geral': ItemEstoque.total_geral(),
     }
     return render(request, 'estoque.html', context)
 
