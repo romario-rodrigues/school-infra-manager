@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Sum, F
 from .models import ItemEstoque, SaidaEstoque
 from .forms import ItemEstoqueForm, SaidaEstoqueForm
 
@@ -41,6 +42,7 @@ def lista_estoque(request):
     itens = ItemEstoque.objects.all().order_by('nome')
     saidas = SaidaEstoque.objects.all().order_by('-data_hora')[:10]  # últimas 10
     entradas_recentes = ItemEstoque.objects.all().order_by('-data_criacao')[:10]
+    total_geral = ItemEstoque.objects.aggregate(total=Sum(F('quantidade_atual') * F('preco_unitario')))['total'] or 0
 
     context = {
         'itens': itens,
@@ -48,7 +50,7 @@ def lista_estoque(request):
         'form_saida': form_saida,
         'saidas': saidas,
         'entradas_recentes': entradas_recentes,
-        'total_geral': ItemEstoque.total_geral(),
+        'total_geral': total_geral,
     }
     return render(request, 'estoque.html', context)
 
