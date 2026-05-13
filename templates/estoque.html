@@ -90,18 +90,19 @@
                                             data-quantidade_atual="{{ item.quantidade_atual }}"
                                             data-quantidade_minima="{{ item.quantidade_minima }}"
                                             data-unidade_medida="{{ item.unidade_medida }}"
-                                            data-localizacao_fisica="{{ item.localizacao_fisica }}">
-                                        <i class="fas fa-edit"></i>
+                                            data-localizacao_fisica="{{ item.localizacao_fisica }}"
+                                            data-preco_unitario="{{ item.preco_unitario }}">
+                                        <i class="fas fa-edit"></i> Editar
                                     </button>
                                     <form method="POST" action="{% url 'excluir_item' item.id %}" style="display:inline;" 
                                           onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-outline-danger me-1 py-0 px-1" title="Excluir Item">
-                                            <i class="fas fa-trash-alt"></i>
+                                            <i class="fas fa-trash-alt"></i> Excluir
                                         </button>
                                     </form>
                                     <a href="{% url 'historico_item' item.id %}" class="btn btn-sm btn-outline-info py-0 px-1" title="Ver Histórico">
-                                        <i class="fas fa-history"></i>
+                                        <i class="fas fa-history"></i> Log
                                     </a>
                                 </td>
                             </tr>
@@ -223,6 +224,10 @@
               <label class="form-label">Localização</label>
               {{ form.localizacao_fisica }}
             </div>
+            <div class="col-md-3">
+              <label class="form-label">Preço Unitário</label>
+              {{ form.preco_unitario }}
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -317,6 +322,10 @@
               <label class="form-label">Localização</label>
               <input type="text" name="localizacao_fisica" id="editLocalizacao" class="form-control">
             </div>
+            <div class="col-md-3">
+              <label class="form-label">Preço Unitário</label>
+              <input type="number" name="preco_unitario" id="editPrecoUnitario" class="form-control" step="0.01" required>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -355,12 +364,15 @@ document.addEventListener('DOMContentLoaded', function() {
         var unidade = button.getAttribute('data-unidade_medida');
         var localizacao = button.getAttribute('data-localizacao_fisica');
 
+        var precoUnitario = button.getAttribute('data-preco_unitario');
+
         document.getElementById('editNome').value = nome;
         document.getElementById('editCategoria').value = categoria;
         document.getElementById('editQtdAtual').value = qtdAtual;
         document.getElementById('editQtdMinima').value = qtdMinima;
         document.getElementById('editUnidade').value = unidade;
         document.getElementById('editLocalizacao').value = localizacao;
+        document.getElementById('editPrecoUnitario').value = precoUnitario;
 
         var form = document.getElementById('editarForm');
         form.action = "{% url 'editar_item' 0 %}".replace('0', id);
