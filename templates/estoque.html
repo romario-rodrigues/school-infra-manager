@@ -108,14 +108,17 @@
                             {% empty %}
                             <tr><td colspan="8" class="text-center py-5">Nenhum item cadastrado.</td></tr>
                             {% endfor %}
-                            <tr class="table-secondary fw-bold">
-                                <td colspan="4" class="text-end pe-3">Total Geral</td>
-                                <td class="text-center">-</td>
-                                <td class="text-center">{{ total_geral|floatformat:2 }}</td>
-                                <td colspan="2"></td>
-                            </tr>
                         </tbody>
-                    </table>
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-secondary fw-bold">
+                            <td colspan="4" class="text-end pe-3">Total Geral</td>
+                            <td class="text-center">-</td>
+                            <td class="text-center">{{ total_geral|floatformat:2 }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
                 </div>
             </div>
         </div>
@@ -336,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
         lengthMenu: [10, 25, 50, 100],
         order: [[0, 'asc']],
         columnDefs: [
-            { orderable: false, targets: 5 } // coluna de ações não ordenável
+            { orderable: false, targets: 7 } // coluna de ações não ordenável
         ]
     });
 
