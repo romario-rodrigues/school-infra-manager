@@ -8,6 +8,7 @@ class Categoria(models.Model):
 
     class Meta:
         verbose_name_plural = "Categorias"
+        ordering = ['nome']
 
 class ItemEstoque(models.Model):
     UNIDADES = (

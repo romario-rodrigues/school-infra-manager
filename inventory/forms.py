@@ -15,6 +15,10 @@ class ItemEstoqueForm(forms.ModelForm):
             'preco_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Preço Unitário', 'step': '0.01'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['categoria'].queryset = Categoria.objects.all().order_by('nome')
+
 class SaidaEstoqueForm(forms.ModelForm):
     class Meta:
         model = SaidaEstoque
