@@ -1,5 +1,5 @@
 from django import forms
-from .models import ItemEstoque, Categoria, SaidaEstoque
+from .models import ItemEstoque, Categoria, SaidaEstoque, OrdemServico
 
 class ItemEstoqueForm(forms.ModelForm):
     class Meta:
