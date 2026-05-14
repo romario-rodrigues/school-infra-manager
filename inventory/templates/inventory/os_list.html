@@ -58,9 +58,16 @@
                         </td>
                         <td>{{ os.data_criacao|date:"d/m/Y H:i" }}</td>
                         <td>
-                            <a href="{% url 'os_edit' os.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'os_edit' os.id %}" class="btn btn-sm btn-primary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if os.status != 'ENTREGUE' %}
+                                <a href="{% url 'os_edit' os.id %}" class="btn btn-sm btn-success" title="Finalizar">
+                                    <i class="fas fa-check-circle"></i>
+                                </a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
