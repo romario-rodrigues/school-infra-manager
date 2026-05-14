@@ -1,8 +1,9 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, F
-from .models import ItemEstoque, SaidaEstoque
+from .models import ItemEstoque, SaidaEstoque, Categoria
 from .forms import ItemEstoqueForm, SaidaEstoqueForm
 
 @login_required
@@ -91,3 +92,12 @@ def historico_item(request, item_id):
         'entradas': entradas,
     }
     return render(request, 'historico_item.html', context)
+
+
+@login_required
+def normalizar_categorias(request):
+    categorias = Categoria.objects.all()
+    for cat in categorias:
+        cat.nome = cat.nome.upper()
+        cat.save()
+    return HttpResponse("Categorias normalizadas com sucesso.")
