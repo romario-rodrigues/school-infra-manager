@@ -10,7 +10,7 @@
         </div>
         <div class="card-body">
             <p><strong>Nome:</strong> {{ item.nome }}</p>
-            <p><strong>Categoria:</strong> {{ item.categoria.nome|default:"-" }}</p>
+            <p><strong>Categoria:</strong> {{ item.categoria.nome|upper|default:"-" }}</p>
             <p><strong>Quantidade Atual:</strong> {{ item.quantidade_atual }}</p>
             <p><strong>Quantidade Mínima:</strong> {{ item.quantidade_minima }}</p>
             <p><strong>Unidade:</strong> {{ item.unidade_medida }}</p>
