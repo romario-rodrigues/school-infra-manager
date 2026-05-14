@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, F
+from django.utils import timezone
 from .models import ItemEstoque, SaidaEstoque, Categoria, OrdemServico
 from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm
 
@@ -114,6 +115,26 @@ def os_create(request):
     else:
         form = OrdemServicoForm()
     context = {'form': form}
+    return render(request, 'inventory/os_form.html', context)
+
+
+@login_required
+def os_edit(request, os_id):
+    ordem = get_object_or_404(OrdemServico, id=os_id)
+    if request.method == 'POST':
+        form = OrdemServicoForm(request.POST, instance=ordem)
+        if form.is_valid():
+            # Se status for ENTREGUE e data_saida vazia, preenche automaticamente
+            if form.cleaned_data['status'] == 'ENTREGUE' and not ordem.data_saida:
+                ordem.data_saida = timezone.now()
+            form.save()
+            messages.success(request, 'Ordem de Serviço atualizada com sucesso.')
+            return redirect('os_list')
+        else:
+            messages.error(request, 'Erro ao atualizar OS. Verifique os dados.')
+    else:
+        form = OrdemServicoForm(instance=ordem)
+    context = {'form': form, 'ordem': ordem}
     return render(request, 'inventory/os_form.html', context)
 
 

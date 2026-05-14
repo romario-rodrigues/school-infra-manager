@@ -24,7 +24,9 @@
                         <th>Defeito</th>
                         <th>Laudo</th>
                         <th>Valor</th>
+                        <th>Status</th>
                         <th>Data</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,11 +41,31 @@
                         <td>{{ os.defeito|truncatechars:30 }}</td>
                         <td>{{ os.laudo|default:"-"|truncatechars:30 }}</td>
                         <td>R$ {{ os.valor|floatformat:2 }}</td>
+                        <td>
+                            {% if os.status == 'ABERTO' %}
+                                <span class="badge bg-secondary">Aberto</span>
+                            {% elif os.status == 'EM_MANUTENCAO' %}
+                                <span class="badge bg-warning text-dark">Em Manutenção</span>
+                            {% elif os.status == 'AGUARDANDO_PECA' %}
+                                <span class="badge bg-info text-dark">Aguardando Peça</span>
+                            {% elif os.status == 'CONCLUIDO' %}
+                                <span class="badge bg-success">Concluído</span>
+                            {% elif os.status == 'ENTREGUE' %}
+                                <span class="badge bg-primary">Entregue</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ os.get_status_display }}</span>
+                            {% endif %}
+                        </td>
                         <td>{{ os.data_criacao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'os_edit' os.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="10" class="text-center text-muted">Nenhuma OS cadastrada.</td>
+                        <td colspan="12" class="text-center text-muted">Nenhuma OS cadastrada.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

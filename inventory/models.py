@@ -76,6 +76,14 @@ class OrdemServico(models.Model):
         ('OUT', 'Outro'),
     )
 
+    STATUS_CHOICES = (
+        ('ABERTO', 'Aberto'),
+        ('EM_MANUTENCAO', 'Em Manutenção'),
+        ('AGUARDANDO_PECA', 'Aguardando Peça'),
+        ('CONCLUIDO', 'Concluído'),
+        ('ENTREGUE', 'Entregue'),
+    )
+
     setor = models.CharField(max_length=3, choices=SETORES, default='OUT')
     solicitante = models.CharField(max_length=200)
     marca = models.CharField(max_length=200)
@@ -83,9 +91,12 @@ class OrdemServico(models.Model):
     numero_serie = models.CharField(max_length=200)
     defeito = models.TextField()
     laudo = models.TextField(blank=True, null=True)
+    laudo_tecnico = models.TextField(blank=True, null=True, verbose_name='Laudo Técnico')
     valor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     itens = models.ManyToManyField(ItemEstoque, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ABERTO')
     data_criacao = models.DateTimeField(auto_now_add=True)
+    data_saida = models.DateTimeField(null=True, blank=True, verbose_name='Data de Saída')
 
     def save(self, *args, **kwargs):
         self.solicitante = self.solicitante.upper()
@@ -95,6 +106,12 @@ class OrdemServico(models.Model):
         self.defeito = self.defeito.upper()
         if self.laudo:
             self.laudo = self.laudo.upper()
+        if self.laudo_tecnico:
+            self.laudo_tecnico = self.laudo_tecnico.upper()
+        # Preenche data_saida automaticamente quando status for ENTREGUE
+        if self.status == 'ENTREGUE' and not self.data_saida:
+            from django.utils import timezone
+            self.data_saida = timezone.now()
         super().save(*args, **kwargs)
 
     def __str__(self):

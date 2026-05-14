@@ -34,7 +34,7 @@ class SaidaEstoqueForm(forms.ModelForm):
 class OrdemServicoForm(forms.ModelForm):
     class Meta:
         model = OrdemServico
-        fields = ['setor', 'solicitante', 'marca', 'modelo', 'numero_serie', 'defeito', 'laudo', 'valor', 'itens']
+        fields = ['setor', 'solicitante', 'marca', 'modelo', 'numero_serie', 'defeito', 'laudo', 'laudo_tecnico', 'valor', 'itens', 'status']
         widgets = {
             'setor': forms.Select(attrs={'class': 'form-select'}),
             'solicitante': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Solicitante'}),
@@ -43,6 +43,8 @@ class OrdemServicoForm(forms.ModelForm):
             'numero_serie': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nº Série'}),
             'defeito': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Defeito'}),
             'laudo': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Laudo'}),
+            'laudo_tecnico': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Laudo Técnico'}),
             'valor': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Valor', 'step': '0.01'}),
             'itens': forms.SelectMultiple(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
