@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, F
-from .models import ItemEstoque, SaidaEstoque, Categoria
-from .forms import ItemEstoqueForm, SaidaEstoqueForm
+from .models import ItemEstoque, SaidaEstoque, Categoria, OrdemServico
+from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm
 
 @login_required
 def lista_estoque(request):
@@ -92,6 +92,29 @@ def historico_item(request, item_id):
         'entradas': entradas,
     }
     return render(request, 'historico_item.html', context)
+
+
+@login_required
+def os_list(request):
+    ordens = OrdemServico.objects.all().order_by('-data_criacao')
+    context = {'ordens': ordens}
+    return render(request, 'os_list.html', context)
+
+
+@login_required
+def os_create(request):
+    if request.method == 'POST':
+        form = OrdemServicoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ordem de Serviço criada com sucesso.')
+            return redirect('os_list')
+        else:
+            messages.error(request, 'Erro ao criar OS. Verifique os dados.')
+    else:
+        form = OrdemServicoForm()
+    context = {'form': form}
+    return render(request, 'os_form.html', context)
 
 
 @login_required

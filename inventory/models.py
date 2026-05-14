@@ -66,3 +66,40 @@ class SaidaEstoque(models.Model):
 
     class Meta:
         verbose_name_plural = "Saídas de Estoque"
+
+
+class OrdemServico(models.Model):
+    SETORES = (
+        ('ADM', 'Administrativo'),
+        ('PED', 'Pedagógico'),
+        ('INF', 'Informática'),
+        ('OUT', 'Outro'),
+    )
+
+    setor = models.CharField(max_length=3, choices=SETORES, default='OUT')
+    solicitante = models.CharField(max_length=200)
+    marca = models.CharField(max_length=200)
+    modelo = models.CharField(max_length=200)
+    numero_serie = models.CharField(max_length=200)
+    defeito = models.TextField()
+    laudo = models.TextField(blank=True, null=True)
+    valor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    itens = models.ManyToManyField(ItemEstoque, blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.solicitante = self.solicitante.upper()
+        self.marca = self.marca.upper()
+        self.modelo = self.modelo.upper()
+        self.numero_serie = self.numero_serie.upper()
+        self.defeito = self.defeito.upper()
+        if self.laudo:
+            self.laudo = self.laudo.upper()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"OS {self.id} - {self.solicitante} ({self.get_setor_display()})"
+
+    class Meta:
+        verbose_name_plural = "Ordens de Serviço"
+        ordering = ['-data_criacao']
