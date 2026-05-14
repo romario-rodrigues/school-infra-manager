@@ -98,7 +98,7 @@ def historico_item(request, item_id):
 def os_list(request):
     ordens = OrdemServico.objects.all().order_by('-data_criacao')
     context = {'ordens': ordens}
-    return render(request, 'os_list.html', context)
+    return render(request, 'inventory/os_list.html', context)
 
 
 @login_required
@@ -114,7 +114,7 @@ def os_create(request):
     else:
         form = OrdemServicoForm()
     context = {'form': form}
-    return render(request, 'os_form.html', context)
+    return render(request, 'inventory/os_form.html', context)
 
 
 @login_required
