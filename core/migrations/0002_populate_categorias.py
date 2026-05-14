@@ -10,6 +10,8 @@ def populate_categorias(apps, schema_editor):
         'Cabos/Adaptadores',
         'Impressoras',
         'Nobreaks',
+        'Outros',
+        'Cftv',
     ]
     for nome in categorias:
         Categoria.objects.get_or_create(nome=nome)
