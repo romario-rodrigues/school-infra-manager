@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Sum, F
 from django.utils import timezone
 from .models import ItemEstoque, SaidaEstoque, Categoria, OrdemServico
-from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm, OsFinishForm
+from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm, OsFinishForm, OsReopenForm
 
 @login_required
 def lista_estoque(request):
@@ -193,6 +193,32 @@ def os_finish(request, os_id):
         form = OsFinishForm(instance=ordem)
     context = {'form': form, 'ordem': ordem}
     return render(request, 'inventory/os_finish.html', context)
+
+
+@login_required
+def os_reopen(request, os_id):
+    ordem = get_object_or_404(OrdemServico, id=os_id)
+    if request.method == 'POST':
+        form = OsReopenForm(request.POST)
+        if form.is_valid():
+            comentario = form.cleaned_data.get('comentario')
+            if comentario:
+                # Adiciona comentário ao laudo existente
+                if ordem.laudo:
+                    ordem.laudo += f"\n\n[REABERTURA] {comentario}"
+                else:
+                    ordem.laudo = f"[REABERTURA] {comentario}"
+            ordem.status = 'ABERTO'
+            ordem.data_saida = None
+            ordem.save()
+            messages.success(request, 'Ordem de Serviço reaberta com sucesso.')
+            return redirect('os_list')
+        else:
+            messages.error(request, 'Erro ao reabrir OS. Verifique os dados.')
+    else:
+        form = OsReopenForm()
+    context = {'form': form, 'ordem': ordem}
+    return render(request, 'inventory/os_reopen.html', context)
 
 
 @login_required

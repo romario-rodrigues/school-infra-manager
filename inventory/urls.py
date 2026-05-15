@@ -10,4 +10,5 @@ urlpatterns = [
     path('os/editar/<int:os_id>/', views.os_edit, name='os_edit'),
     path('os/<int:os_id>/', views.os_detail, name='os_detail'),
     path('os/finalizar/<int:os_id>/', views.os_finish, name='os_finish'),
+    path('os/reabrir/<int:os_id>/', views.os_reopen, name='os_reopen'),
 ]

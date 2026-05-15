@@ -73,3 +73,11 @@ class OsFinishForm(forms.ModelForm):
         widgets = {
             'laudo_tecnico': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Laudo Técnico'}),
         }
+
+
+class OsReopenForm(forms.Form):
+    comentario = forms.CharField(
+        required=False,
+        label='Comentário (opcional)',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Motivo da reabertura...'})
+    )
