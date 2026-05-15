@@ -48,3 +48,13 @@ class OrdemServicoForm(forms.ModelForm):
             'itens': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def clean_itens(self):
+        itens = self.cleaned_data.get('itens')
+        if itens:
+            for item in itens:
+                if item.quantidade_atual <= 0:
+                    raise forms.ValidationError(
+                        f'O item "{item.nome}" está sem saldo no estoque (quantidade atual: {item.quantidade_atual}).'
+                    )
+        return itens

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-clipboard-list me-2"></i>Ordem de Serviço #{{ ordem.id }}</h5>
+            <a href="{% url 'os_list' %}" class="btn btn-secondary btn-sm">Voltar</a>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <strong>Setor:</strong> {{ ordem.get_setor_display }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Solicitante:</strong> {{ ordem.solicitante }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Status:</strong>
+                    {% if ordem.status == 'ABERTO' %}
+                        <span class="badge bg-secondary">Aberto</span>
+                    {% elif ordem.status == 'EM_MANUTENCAO' %}
+                        <span class="badge bg-warning text-dark">Em Manutenção</span>
+                    {% elif ordem.status == 'AGUARDANDO_PECA' %}
+                        <span class="badge bg-info text-dark">Aguardando Peça</span>
+                    {% elif ordem.status == 'CONCLUIDO' %}
+                        <span class="badge bg-success">Concluído</span>
+                    {% elif ordem.status == 'ENTREGUE' %}
+                        <span class="badge bg-primary">Entregue</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ ordem.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <strong>Marca:</strong> {{ ordem.marca }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Modelo:</strong> {{ ordem.modelo }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Nº Série:</strong> {{ ordem.numero_serie }}
+                </div>
+                <div class="col-12">
+                    <strong>Defeito:</strong>
+                    <p class="mb-0">{{ ordem.defeito }}</p>
+                </div>
+                <div class="col-12">
+                    <strong>Laudo:</strong>
+                    <p class="mb-0">{{ ordem.laudo|default:"-" }}</p>
+                </div>
+                <div class="col-12">
+                    <strong>Laudo Técnico:</strong>
+                    <p class="mb-0">{{ ordem.laudo_tecnico|default:"-" }}</p>
+                </div>
+                <div class="col-md-4">
+                    <strong>Valor:</strong> R$ {{ ordem.valor|floatformat:2 }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Data de Criação:</strong> {{ ordem.data_criacao|date:"d/m/Y H:i" }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Data de Saída:</strong> {{ ordem.data_saida|date:"d/m/Y H:i"|default:"-" }}
+                </div>
+                <div class="col-12">
+                    <strong>Peças Utilizadas:</strong>
+                    <ul>
+                        {% for item in ordem.itens.all %}
+                            <li>{{ item.nome }} ({{ item.quantidade_atual }} em estoque)</li>
+                        {% empty %}
+                            <li class="text-muted">Nenhuma peça associada.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

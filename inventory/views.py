@@ -102,12 +102,23 @@ def os_list(request):
     return render(request, 'inventory/os_list.html', context)
 
 
+def baixar_estoque(ordem):
+    """Subtrai 1 da quantidade de cada item associado à OS."""
+    for item in ordem.itens.all():
+        if item.quantidade_atual > 0:
+            item.quantidade_atual -= 1
+            item.save()
+
+
 @login_required
 def os_create(request):
     if request.method == 'POST':
         form = OrdemServicoForm(request.POST)
         if form.is_valid():
-            form.save()
+            ordem = form.save(commit=False)
+            ordem.save()
+            form.save_m2m()  # salva ManyToMany
+            baixar_estoque(ordem)
             messages.success(request, 'Ordem de Serviço criada com sucesso.')
             return redirect('os_list')
         else:
@@ -127,7 +138,10 @@ def os_edit(request, os_id):
             # Se status for ENTREGUE e data_saida vazia, preenche automaticamente
             if form.cleaned_data['status'] == 'ENTREGUE' and not ordem.data_saida:
                 ordem.data_saida = timezone.now()
-            form.save()
+            ordem = form.save(commit=False)
+            ordem.save()
+            form.save_m2m()
+            baixar_estoque(ordem)
             messages.success(request, 'Ordem de Serviço atualizada com sucesso.')
             return redirect('os_list')
         else:
@@ -136,6 +150,13 @@ def os_edit(request, os_id):
         form = OrdemServicoForm(instance=ordem)
     context = {'form': form, 'ordem': ordem}
     return render(request, 'inventory/os_form.html', context)
+
+
+@login_required
+def os_detail(request, os_id):
+    ordem = get_object_or_404(OrdemServico, id=os_id)
+    context = {'ordem': ordem}
+    return render(request, 'inventory/os_detail.html', context)
 
 
 @login_required
