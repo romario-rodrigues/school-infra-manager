@@ -104,13 +104,13 @@ def os_list(request):
 
 def baixar_estoque(ordem):
     """Subtrai 1 da quantidade de cada item associado à OS, se ainda não foi efetuada."""
-    if not ordem.baixa_efetuada:
+    if not ordem.estoque_debitado:
         for item in ordem.itens.all():
             if item.quantidade_atual > 0:
                 item.quantidade_atual -= 1
                 item.save()
-        ordem.baixa_efetuada = True
-        ordem.save(update_fields=['baixa_efetuada'])
+        ordem.estoque_debitado = True
+        ordem.save(update_fields=['estoque_debitado'])
 
 
 @login_required
@@ -175,12 +175,12 @@ def os_finish(request, os_id):
                 if not ordem.data_saida:
                     ordem.data_saida = timezone.now()
                 # Baixa de estoque se ainda não foi efetuada
-                if not ordem.baixa_efetuada:
+                if not ordem.estoque_debitado:
                     for item in ordem.itens.all():
                         if item.quantidade_atual > 0:
                             item.quantidade_atual -= 1
                             item.save()
-                    ordem.baixa_efetuada = True
+                    ordem.estoque_debitado = True
             else:
                 # Se não marcar entregue, apenas salva laudo técnico
                 pass

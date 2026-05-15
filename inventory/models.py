@@ -97,7 +97,7 @@ class OrdemServico(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ABERTO')
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_saida = models.DateTimeField(null=True, blank=True, verbose_name='Data de Saída')
-    baixa_efetuada = models.BooleanField(default=False, verbose_name='Baixa de Estoque já efetuada')
+    estoque_debitado = models.BooleanField(default=False, verbose_name='Estoque já debitado')
 
     def save(self, *args, **kwargs):
         self.solicitante = self.solicitante.upper()
