@@ -9,4 +9,5 @@ urlpatterns = [
     path('os/novo/', views.os_create, name='os_create'),
     path('os/editar/<int:os_id>/', views.os_edit, name='os_edit'),
     path('os/<int:os_id>/', views.os_detail, name='os_detail'),
+    path('os/finalizar/<int:os_id>/', views.os_finish, name='os_finish'),
 ]

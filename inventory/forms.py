@@ -58,3 +58,18 @@ class OrdemServicoForm(forms.ModelForm):
                         f'O item "{item.nome}" está sem saldo no estoque (quantidade atual: {item.quantidade_atual}).'
                     )
         return itens
+
+
+class OsFinishForm(forms.ModelForm):
+    entregue = forms.BooleanField(
+        required=False,
+        label='Entregue ao Setor?',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = OrdemServico
+        fields = ['laudo_tecnico']
+        widgets = {
+            'laudo_tecnico': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Laudo Técnico'}),
+        }

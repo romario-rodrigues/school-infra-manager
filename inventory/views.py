@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Sum, F
 from django.utils import timezone
 from .models import ItemEstoque, SaidaEstoque, Categoria, OrdemServico
-from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm
+from .forms import ItemEstoqueForm, SaidaEstoqueForm, OrdemServicoForm, OsFinishForm
 
 @login_required
 def lista_estoque(request):
@@ -103,11 +103,14 @@ def os_list(request):
 
 
 def baixar_estoque(ordem):
-    """Subtrai 1 da quantidade de cada item associado à OS."""
-    for item in ordem.itens.all():
-        if item.quantidade_atual > 0:
-            item.quantidade_atual -= 1
-            item.save()
+    """Subtrai 1 da quantidade de cada item associado à OS, se ainda não foi efetuada."""
+    if not ordem.baixa_efetuada:
+        for item in ordem.itens.all():
+            if item.quantidade_atual > 0:
+                item.quantidade_atual -= 1
+                item.save()
+        ordem.baixa_efetuada = True
+        ordem.save(update_fields=['baixa_efetuada'])
 
 
 @login_required
@@ -141,6 +144,7 @@ def os_edit(request, os_id):
             ordem = form.save(commit=False)
             ordem.save()
             form.save_m2m()
+            # Baixa de estoque apenas se itens foram alterados e ainda não baixados
             baixar_estoque(ordem)
             messages.success(request, 'Ordem de Serviço atualizada com sucesso.')
             return redirect('os_list')
@@ -157,6 +161,38 @@ def os_detail(request, os_id):
     ordem = get_object_or_404(OrdemServico, id=os_id)
     context = {'ordem': ordem}
     return render(request, 'inventory/os_detail.html', context)
+
+
+@login_required
+def os_finish(request, os_id):
+    ordem = get_object_or_404(OrdemServico, id=os_id)
+    if request.method == 'POST':
+        form = OsFinishForm(request.POST, instance=ordem)
+        if form.is_valid():
+            entregue = form.cleaned_data.get('entregue')
+            if entregue:
+                ordem.status = 'ENTREGUE'
+                if not ordem.data_saida:
+                    ordem.data_saida = timezone.now()
+                # Baixa de estoque se ainda não foi efetuada
+                if not ordem.baixa_efetuada:
+                    for item in ordem.itens.all():
+                        if item.quantidade_atual > 0:
+                            item.quantidade_atual -= 1
+                            item.save()
+                    ordem.baixa_efetuada = True
+            else:
+                # Se não marcar entregue, apenas salva laudo técnico
+                pass
+            form.save()
+            messages.success(request, 'Ordem de Serviço finalizada com sucesso.')
+            return redirect('os_list')
+        else:
+            messages.error(request, 'Erro ao finalizar OS. Verifique os dados.')
+    else:
+        form = OsFinishForm(instance=ordem)
+    context = {'form': form, 'ordem': ordem}
+    return render(request, 'inventory/os_finish.html', context)
 
 
 @login_required
