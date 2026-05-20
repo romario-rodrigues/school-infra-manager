@@ -182,14 +182,18 @@ def os_finish(request, os_id):
         print("DEBUG os_finish form errors:", form.errors)  # adicionado
         if form.is_valid():
             entregue = form.cleaned_data.get('entregue')
-            ordem = form.save(commit=False)  # obtém instância sem salvar
+            # Salva laudo técnico (campos do formulário)
+            form.save()
+            # Altera status e data_saida conforme checkbox
             if entregue:
                 ordem.status = 'ENTREGUE'
                 if not ordem.data_saida:
                     ordem.data_saida = timezone.now()
                 debitar_estoque(ordem)
-            # else: mantém status atual (não altera)
-            ordem.save()  # salva todas as alterações (status, data_saida, laudo_tecnico)
+            else:
+                ordem.status = 'CONCLUIDO'
+            # Salva as alterações de status e data_saida
+            ordem.save(update_fields=['status', 'data_saida'])
             messages.success(request, 'Ordem de Serviço finalizada com sucesso.')
             return redirect('os_list')
         else:
