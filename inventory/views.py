@@ -179,21 +179,21 @@ def os_finish(request, os_id):
     ordem = get_object_or_404(OrdemServico, id=os_id)
     if request.method == 'POST':
         form = OsFinishForm(request.POST, instance=ordem)
+        print("DEBUG os_finish form errors:", form.errors)  # adicionado
         if form.is_valid():
             entregue = form.cleaned_data.get('entregue')
+            ordem = form.save(commit=False)  # obtém instância sem salvar
             if entregue:
                 ordem.status = 'ENTREGUE'
                 if not ordem.data_saida:
                     ordem.data_saida = timezone.now()
-                # Baixa de estoque se ainda não foi efetuada
                 debitar_estoque(ordem)
-            else:
-                # Se não marcar entregue, apenas salva laudo técnico
-                pass
-            form.save()
+            # else: mantém status atual (não altera)
+            ordem.save()  # salva todas as alterações (status, data_saida, laudo_tecnico)
             messages.success(request, 'Ordem de Serviço finalizada com sucesso.')
             return redirect('os_list')
         else:
+            print("DEBUG os_finish form errors (invalid):", form.errors)  # adicionado
             messages.error(request, 'Erro ao finalizar OS. Verifique os dados.')
     else:
         form = OsFinishForm(instance=ordem)
