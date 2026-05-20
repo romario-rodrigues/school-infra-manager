@@ -102,7 +102,7 @@ def os_list(request):
     return render(request, 'inventory/os_list.html', context)
 
 
-def baixar_estoque(ordem):
+def debitar_estoque(ordem):
     """Subtrai 1 da quantidade de cada item associado à OS, se ainda não foi efetuada."""
     if not ordem.estoque_debitado:
         for item in ordem.itens.all():
@@ -110,6 +110,15 @@ def baixar_estoque(ordem):
                 item.quantidade_atual -= 1
                 item.save()
         ordem.estoque_debitado = True
+        ordem.save(update_fields=['estoque_debitado'])
+
+def reverter_baixa(ordem):
+    """Reverte a baixa de estoque (incrementa 1 em cada item)."""
+    if ordem.estoque_debitado:
+        for item in ordem.itens.all():
+            item.quantidade_atual += 1
+            item.save()
+        ordem.estoque_debitado = False
         ordem.save(update_fields=['estoque_debitado'])
 
 
@@ -121,7 +130,7 @@ def os_create(request):
             ordem = form.save(commit=False)
             ordem.save()
             form.save_m2m()  # salva ManyToMany
-            baixar_estoque(ordem)
+            debitar_estoque(ordem)
             messages.success(request, 'Ordem de Serviço criada com sucesso.')
             return redirect('os_list')
         else:
@@ -144,8 +153,10 @@ def os_edit(request, os_id):
             ordem = form.save(commit=False)
             ordem.save()
             form.save_m2m()
-            # Baixa de estoque apenas se itens foram alterados e ainda não baixados
-            baixar_estoque(ordem)
+            # Se já havia sido debitado, reverter antes de debitar novamente
+            if ordem.estoque_debitado:
+                reverter_baixa(ordem)
+            debitar_estoque(ordem)
             messages.success(request, 'Ordem de Serviço atualizada com sucesso.')
             return redirect('os_list')
         else:
@@ -175,12 +186,7 @@ def os_finish(request, os_id):
                 if not ordem.data_saida:
                     ordem.data_saida = timezone.now()
                 # Baixa de estoque se ainda não foi efetuada
-                if not ordem.estoque_debitado:
-                    for item in ordem.itens.all():
-                        if item.quantidade_atual > 0:
-                            item.quantidade_atual -= 1
-                            item.save()
-                    ordem.estoque_debitado = True
+                debitar_estoque(ordem)
             else:
                 # Se não marcar entregue, apenas salva laudo técnico
                 pass
@@ -210,6 +216,8 @@ def os_reopen(request, os_id):
                     ordem.laudo = f"[REABERTURA] {comentario}"
             ordem.status = 'ABERTO'
             ordem.data_saida = None
+            # Reverter baixa de estoque
+            reverter_baixa(ordem)
             ordem.save()
             messages.success(request, 'Ordem de Serviço reaberta com sucesso.')
             return redirect('os_list')
